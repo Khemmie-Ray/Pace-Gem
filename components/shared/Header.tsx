@@ -10,9 +10,10 @@ const Header = () => {
         alt='Pace logo'
         width={100}
         height={100}
+        className='w-17.5 lg:w-25 md:w-16'
         />
         <nav>
-          <button className='bg-linear-to-br from-[#5F5DFC] to-[#B840F9] rounded-lg py-3 px-8'>Get Started</button>
+          <button className='bg-linear-to-br from-[#5F5DFC] to-[#B840F9] rounded-lg py-3 lg:px-8 md:px-6 px-4'>Get Started</button>
         </nav>
     </header>
   )

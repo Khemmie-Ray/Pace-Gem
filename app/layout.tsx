@@ -29,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${montserrat.variable} antialiased w-full max-w-387.5 mx-auto`}
       >
-        <div className="flex flex-col w-full h-screen">
+        <div className="flex flex-col w-full h-screen font-inter">
           <Header />
         {children}
         <Footer />
