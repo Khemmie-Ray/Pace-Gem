@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import bgImg from "../public/bg.png";
+import Link from "next/link";
 
 const Home = () => {
   return (
@@ -26,9 +27,9 @@ const Home = () => {
               Reading becomes measured. Progress becomes real.
             </p>
           </div>
-          <button className="bg-linear-to-br from-[#5F5DFC] to-[#B840F9] rounded-lg py-3 px-8 w-full lg:w-[40%] md:w-[50%] lg:text-[18px] md:text-[18px] text-[16px] font-semibold">
+          <Link href='/get-started' className="bg-linear-to-br from-[#5F5DFC] to-[#B840F9] rounded-lg py-3 px-8 w-full lg:w-[40%] md:w-[50%] lg:text-[18px] md:text-[18px] text-[16px] font-semibold">
             Get Started
-          </button>
+          </Link>
              <div className="w-full my-10 block md:hidden lg-hidden">
           <Image
             src={bgImg}
