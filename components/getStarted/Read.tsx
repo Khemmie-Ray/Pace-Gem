@@ -1,4 +1,5 @@
-import React from 'react';
+"use client"
+
 import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useReading } from '@/contexts/ReadingContext';
 
