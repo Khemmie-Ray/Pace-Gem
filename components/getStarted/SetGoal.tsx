@@ -18,12 +18,16 @@ const SetGoal = () => {
     loadDummyData,
     startReading,
     hasStarted,
+    startWordIndex,
+    setStartWordIndex,
   } = useReading();
 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
   const [parsedMetadata, setParsedMetadata] = useState<any>(null);
   const [chapters, setChapters] = useState<any[]>([]);
+  const [previewPage, setPreviewPage] = useState(0);
+  const WORDS_PER_PAGE = 100;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -181,6 +185,146 @@ const SetGoal = () => {
               </p>
             </div>
           </div>
+          {words.length > 0 && (
+            <div className="mb-6 space-y-4 mt-4">
+            
+              {chapters.length > 0 && (
+                <div className="p-4 rounded-lg border border-white/20 bg-white/5">
+                  <p className="text-sm text-gray-300 mb-3 font-semibold">
+                    Jump to Section:
+                  </p>
+                  <select
+                    value={
+                      chapters.findIndex(
+                        (ch) =>
+                          ch.startIndex <= startWordIndex &&
+                          ch.endIndex > startWordIndex,
+                      ) ?? 0
+                    }
+                    onChange={(e) => {
+                      const chapterIndex = parseInt(e.target.value);
+                      const chapter = chapters[chapterIndex];
+                      if (chapter) {
+                        setStartWordIndex(chapter.startIndex);
+                        setPreviewPage(
+                          Math.floor(chapter.startIndex / WORDS_PER_PAGE),
+                        );
+                        toast.success(`Will start from: ${chapter.title}`);
+                      }
+                    }}
+                    className="w-full p-2 border border-white/20 rounded-lg bg-white/5 text-white focus:border-purple-400 transition-colors"
+                  >
+                    {chapters.map((chapter, idx) => (
+                      <option key={idx} value={idx}>
+                        {chapter.title} (Word {chapter.startIndex + 1})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="p-4 rounded-lg border border-white/20 bg-white/5">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-sm text-gray-300 font-semibold">
+                    Preview - Click any word to start there:
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Words {previewPage * WORDS_PER_PAGE + 1} -{" "}
+                    {Math.min((previewPage + 1) * WORDS_PER_PAGE, words.length)}
+                  </p>
+                </div>
+
+                <div className="max-h-40 overflow-y-auto pr-2 custom-scrollbar mb-3">
+                  <p className="text-sm leading-relaxed">
+                    {words
+                      .slice(
+                        previewPage * WORDS_PER_PAGE,
+                        (previewPage + 1) * WORDS_PER_PAGE,
+                      )
+                      .map((word, relativeIdx) => {
+                        const absoluteIdx =
+                          previewPage * WORDS_PER_PAGE + relativeIdx;
+                        return (
+                          <span
+                            key={absoluteIdx}
+                            onClick={() => {
+                              setStartWordIndex(absoluteIdx);
+                              toast.success(
+                                `Will start from word ${absoluteIdx + 1}: "${word}"`,
+                              );
+                            }}
+                            className={`cursor-pointer hover:bg-purple-500/30 hover:text-purple-200 px-1 rounded transition-colors ${
+                              absoluteIdx === startWordIndex
+                                ? "bg-purple-500/50 text-purple-100 font-bold"
+                                : ""
+                            }`}
+                          >
+                            {word}{" "}
+                          </span>
+                        );
+                      })}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                  <button
+                    onClick={() =>
+                      setPreviewPage((prev) => Math.max(0, prev - 1))
+                    }
+                    disabled={previewPage === 0}
+                    className="px-3 py-1.5 text-sm bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors"
+                  >
+                    ← Previous
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-gray-400">
+                      Page {previewPage + 1} of{" "}
+                      {Math.ceil(words.length / WORDS_PER_PAGE)}
+                    </p>
+                    {startWordIndex > 0 && (
+                      <button
+                        onClick={() => {
+                          setPreviewPage(
+                            Math.floor(startWordIndex / WORDS_PER_PAGE),
+                          );
+                          toast.info("Jumped to selected word");
+                        }}
+                        className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded hover:bg-purple-500/30 transition-colors"
+                      >
+                        Go to selected word
+                      </button>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      setPreviewPage((prev) =>
+                        Math.min(
+                          Math.ceil(words.length / WORDS_PER_PAGE) - 1,
+                          prev + 1,
+                        ),
+                      )
+                    }
+                    disabled={
+                      previewPage >=
+                      Math.ceil(words.length / WORDS_PER_PAGE) - 1
+                    }
+                    className="px-3 py-1.5 text-sm bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors"
+                  >
+                    Next →
+                  </button>
+                </div>
+
+                {startWordIndex > 0 && (
+                  <p className="text-xs text-purple-300 mt-2 text-center">
+                    ✓ Starting from word {startWordIndex + 1} of{" "}
+                    {words.length.toLocaleString()}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
           {chapters.length > 0 && chapters.length < 20 && (
             <div className="mt-4 pt-4 border-t border-white/10">
@@ -197,17 +341,6 @@ const SetGoal = () => {
               </div>
             </div>
           )}
-        </div>
-      )}
-
-      {words.length > 0 && (
-        <div className="p-4 rounded-lg mb-6 border border-white/20 bg-white/5">
-          <p className="text-sm text-gray-300 mb-2">
-            Preview (first 50 words):
-          </p>
-          <p className="text-sm leading-relaxed">
-            {words.slice(0, 50).join(" ")}...
-          </p>
         </div>
       )}
 

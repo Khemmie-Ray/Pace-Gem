@@ -24,7 +24,7 @@ const Read = () => {
 
   if (!hasStarted) {
     return (
-      <div className="bg-linear-to-br from-gray-900 via-purple-900 to-gray-900 backdrop-blur-lg rounded-2xl p-6 h-[80vh] flex items-center justify-center">
+      <div className="bg-linear-to-br from-gray-900 via-purple-900 to-gray-900 backdrop-blur-lg rounded-2xl p-6 h-[70vh] flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-3xl font-bold mb-4 text-gray-400">
             Set your goals to begin reading

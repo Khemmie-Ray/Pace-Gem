@@ -43,6 +43,8 @@ interface ReadingContextType {
   goForward: () => void;
   formatTime: (seconds: number) => string;
   progressPercent: number;
+  startWordIndex: number;
+  setStartWordIndex: (index: number) => void;
 }
 
 const ReadingContext = createContext<ReadingContextType | undefined>(undefined);
@@ -65,6 +67,7 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
+  const [startWordIndex, setStartWordIndex] = useState<number>(0);
 
   const loadDummyData = () => {
     const wordsArray = DUMMY_TEXT.split(/\s+/).filter(
@@ -76,15 +79,17 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
 
   const startReading = () => {
     if (!wordGoal || !wpm) {
-      toast.warning("Please set both word goal and reading speed");
+      alert("Please set both word goal and reading speed");
       return;
     }
     if (words.length === 0) {
-      toast.warning("Please upload a file or load dummy data");
+      alert("Please upload a file or load dummy data");
       return;
     }
     setHasStarted(true);
     setIsPlaying(true);
+    setCurrentWordIndex(startWordIndex); // Start from selected position
+    setWordsRead(startWordIndex); // Account for words already "read"
     startTimeRef.current = Date.now();
   };
 
@@ -196,6 +201,8 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
         goForward,
         formatTime,
         progressPercent,
+        startWordIndex,
+        setStartWordIndex,
       }}
     >
       {children}

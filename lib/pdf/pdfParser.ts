@@ -203,9 +203,107 @@ function removeFrontMatter(text: string): string {
 /**
  * Detect chapters in the text
  */
+// function detectChapters(text: string): Chapter[] {
+//   const chapters: Chapter[] = [];
+//   const lines = text.split('\n');
+  
+//   let currentChapter: Partial<Chapter> | null = null;
+//   let currentContent: string[] = [];
+//   let wordIndex = 0;
+  
+//   for (const line of lines) {
+//     const trimmedLine = line.trim();
+    
+//     // Check if this line is a chapter heading
+//     const isChapterHeading = CHAPTER_PATTERNS.some(pattern => 
+//       pattern.test(trimmedLine)
+//     );
+    
+//     if (isChapterHeading) {
+//       // Save previous chapter if exists
+//       if (currentChapter && currentContent.length > 0) {
+//         const content = currentContent.join('\n');
+//         const words = content.split(/\s+/).filter(w => w.length > 0);
+        
+//         chapters.push({
+//           title: currentChapter.title!,
+//           content,
+//           wordCount: words.length,
+//           startIndex: currentChapter.startIndex!,
+//           endIndex: wordIndex,
+//         });
+//       }
+      
+//       // Start new chapter
+//       currentChapter = {
+//         title: trimmedLine,
+//         startIndex: wordIndex,
+//       };
+//       currentContent = [];
+      
+//       console.log('Found chapter:', trimmedLine);
+//     } else if (currentChapter) {
+//       // Add to current chapter content
+//       currentContent.push(line);
+//       const lineWords = line.split(/\s+/).filter(w => w.length > 0);
+//       wordIndex += lineWords.length;
+//     }
+//   }
+  
+//   // Save last chapter
+//   if (currentChapter && currentContent.length > 0) {
+//     const content = currentContent.join('\n');
+//     const words = content.split(/\s+/).filter(w => w.length > 0);
+    
+//     chapters.push({
+//       title: currentChapter.title!,
+//       content,
+//       wordCount: words.length,
+//       startIndex: currentChapter.startIndex!,
+//       endIndex: wordIndex,
+//     });
+//   }
+  
+//   // If no chapters detected, create one "main" chapter
+//   if (chapters.length === 0) {
+//     const words = text.split(/\s+/).filter(w => w.length > 0);
+//     chapters.push({
+//       title: 'Main Content',
+//       content: text,
+//       wordCount: words.length,
+//       startIndex: 0,
+//       endIndex: words.length,
+//     });
+//   }
+  
+//   console.log(`Detected ${chapters.length} chapters`);
+//   return chapters;
+// }
+
 function detectChapters(text: string): Chapter[] {
   const chapters: Chapter[] = [];
   const lines = text.split('\n');
+  
+  // Expanded patterns to include ALL sections
+  const ALL_SECTION_PATTERNS = [
+    /^foreword$/i,
+    /^preface$/i,
+    /^prologue$/i,
+    /^introduction$/i,
+    /^table of contents$/i,
+    /^contents$/i,
+    /^acknowledgements?$/i,
+    /^dedication$/i,
+    /^about the author$/i,
+    /^chapter\s+\d+/i,
+    /^chapter\s+[ivxlcdm]+/i,
+    /^part\s+\d+/i,
+    /^section\s+\d+/i,
+    /^\d+\.\s+[A-Z]/,
+    /^epilogue$/i,
+    /^afterword$/i,
+    /^appendix/i,
+  ];
   
   let currentChapter: Partial<Chapter> | null = null;
   let currentContent: string[] = [];
@@ -214,13 +312,13 @@ function detectChapters(text: string): Chapter[] {
   for (const line of lines) {
     const trimmedLine = line.trim();
     
-    // Check if this line is a chapter heading
-    const isChapterHeading = CHAPTER_PATTERNS.some(pattern => 
+    // Check if this is ANY section heading
+    const isSectionHeading = ALL_SECTION_PATTERNS.some(pattern => 
       pattern.test(trimmedLine)
-    );
+    ) && trimmedLine.length < 100; // Headings are short
     
-    if (isChapterHeading) {
-      // Save previous chapter if exists
+    if (isSectionHeading) {
+      // Save previous section if exists
       if (currentChapter && currentContent.length > 0) {
         const content = currentContent.join('\n');
         const words = content.split(/\s+/).filter(w => w.length > 0);
@@ -234,23 +332,26 @@ function detectChapters(text: string): Chapter[] {
         });
       }
       
-      // Start new chapter
+      // Start new section
       currentChapter = {
         title: trimmedLine,
         startIndex: wordIndex,
       };
       currentContent = [];
       
-      console.log('Found chapter:', trimmedLine);
+      console.log('Found section:', trimmedLine);
     } else if (currentChapter) {
-      // Add to current chapter content
       currentContent.push(line);
+      const lineWords = line.split(/\s+/).filter(w => w.length > 0);
+      wordIndex += lineWords.length;
+    } else {
+      // Before any section - count words
       const lineWords = line.split(/\s+/).filter(w => w.length > 0);
       wordIndex += lineWords.length;
     }
   }
   
-  // Save last chapter
+  // Save last section
   if (currentChapter && currentContent.length > 0) {
     const content = currentContent.join('\n');
     const words = content.split(/\s+/).filter(w => w.length > 0);
@@ -264,11 +365,11 @@ function detectChapters(text: string): Chapter[] {
     });
   }
   
-  // If no chapters detected, create one "main" chapter
+  // If no sections detected, create one "Full Book" section
   if (chapters.length === 0) {
     const words = text.split(/\s+/).filter(w => w.length > 0);
     chapters.push({
-      title: 'Main Content',
+      title: 'Full Book',
       content: text,
       wordCount: words.length,
       startIndex: 0,
@@ -276,6 +377,6 @@ function detectChapters(text: string): Chapter[] {
     });
   }
   
-  console.log(`Detected ${chapters.length} chapters`);
+  console.log(`Detected ${chapters.length} sections`);
   return chapters;
 }
