@@ -8,7 +8,7 @@ import { ReadingProvider } from "@/contexts/ReadingContext";
 const GetStarted = () => {
   return (
     <ReadingProvider>
-      <main className="flex flex-col lg:flex-row justify-between w-[90%] mx-auto my-8">
+      <main className="flex flex-col lg:flex-row md:flex-row justify-between w-[90%] mx-auto my-8">
         <section className="lg:w-[35%] w-full h-[70vh] overflow-y-scroll">
           <SetGoal />
           <AssessGoal />

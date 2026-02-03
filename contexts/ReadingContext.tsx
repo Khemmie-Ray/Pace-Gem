@@ -45,6 +45,9 @@ interface ReadingContextType {
   progressPercent: number;
   startWordIndex: number;
   setStartWordIndex: (index: number) => void;
+  aiAnalysis: any;
+  isAnalyzing: boolean;
+  analyzeSession: () => Promise<void>;
 }
 
 const ReadingContext = createContext<ReadingContextType | undefined>(undefined);
@@ -69,6 +72,9 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
   const startTimeRef = useRef<number | null>(null);
   const [startWordIndex, setStartWordIndex] = useState<number>(0);
 
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const loadDummyData = () => {
     const wordsArray = DUMMY_TEXT.split(/\s+/).filter(
       (word) => word.length > 0,
@@ -88,8 +94,8 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
     }
     setHasStarted(true);
     setIsPlaying(true);
-    setCurrentWordIndex(startWordIndex); // Start from selected position
-    setWordsRead(startWordIndex); // Account for words already "read"
+    setCurrentWordIndex(startWordIndex);
+    setWordsRead(0);
     startTimeRef.current = Date.now();
   };
 
@@ -104,7 +110,7 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
             setIsPlaying(false);
             return prev;
           }
-          setWordsRead(next);
+          setWordsRead((prev) => prev + 1); // CHANGED: Increment wordsRead separately
           return next;
         });
       }, interval);
@@ -139,6 +145,39 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
     setIsPlaying(!isPlaying);
   };
 
+  const analyzeSession = async () => {
+    if (wordsRead === 0) return;
+
+    setIsAnalyzing(true);
+
+    try {
+      const sessionData = {
+        wordGoal: parseInt(wordGoal),
+        wordsRead,
+        targetWPM: parseInt(wpm),
+        actualWPM,
+        timeSpent,
+        completionRate: progressPercent,
+      };
+
+      const response = await fetch("/api/ai/analyze-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sessionData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setAiAnalysis(result.analysis);
+      }
+    } catch (error) {
+      console.error("Failed to get AI analysis:", error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const resetReading = () => {
     setIsPlaying(false);
     setCurrentWordIndex(0);
@@ -148,9 +187,9 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const goBack = () => {
-    if (currentWordIndex > 0) {
+    if (currentWordIndex > startWordIndex) {
       setCurrentWordIndex((prev) => prev - 1);
-      setWordsRead((prev) => Math.max(0, prev - 1));
+      setWordsRead((prev) => Math.max(0, prev - 1)); 
     }
   };
 
@@ -170,6 +209,12 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
   const progressPercent = wordGoal
     ? Math.min((wordsRead / parseInt(wordGoal)) * 100, 100)
     : 0;
+
+  useEffect(() => {
+    if (progressPercent >= 100 && !aiAnalysis) {
+      analyzeSession();
+    }
+  }, [progressPercent]);
 
   return (
     <ReadingContext.Provider
@@ -203,6 +248,9 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
         progressPercent,
         startWordIndex,
         setStartWordIndex,
+        aiAnalysis,
+        isAnalyzing,
+        analyzeSession,
       }}
     >
       {children}
