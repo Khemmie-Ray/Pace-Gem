@@ -109,25 +109,25 @@ const SetGoal = () => {
                 : "border-white/20 hover:border-purple-400"
             } transition-colors p-8 rounded-lg cursor-pointer bg-white/5 hover:bg-white/10`}
           >
-            <div className="flex flex-col items-center justify-center gap-3">
+            <div className="flex flex-col items-center justify-center gap-3 p-2">
               {isUploading ? (
                 <>
-                  <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
+                  <Loader2 className="w-10 h-10 text-purple-400 animate-spin" />
                   <p className="text-center text-purple-300">
                     {uploadProgress}
                   </p>
                 </>
               ) : fileName ? (
                 <>
-                  <CheckCircle className="w-12 h-12 text-green-400" />
-                  <p className="text-center text-green-300">{fileName}</p>
+                  <CheckCircle className="w-8 h-8 text-green-400" />
+                  <p className="text-center text-green-300 wrap-break-all whitespace-normal px-4">{fileName.length > 40 ? fileName.slice(0, 40) + "..." : fileName}</p>
                   <p className="text-xs text-gray-400">
                     Click to upload different file
                   </p>
                 </>
               ) : (
                 <>
-                  <Upload className="w-12 h-12 text-purple-400" />
+                  <Upload className="w-10 h-10 text-purple-400" />
                   <p className="text-center">Click to upload PDF file</p>
                   <p className="text-sm text-gray-400">
                     PDF files only (max 10MB)
@@ -223,13 +223,14 @@ const SetGoal = () => {
                 </div>
               )}
 
-              <div className="p-4 rounded-lg border border-white/20 bg-white/5">
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-sm text-gray-300 font-semibold">
-                    Preview - Click any word to start there:
+              {/* <div className=""> */}
+                <div className="flex justify-between items-center mb-2 mt-3 border-b border-white/20">
+                  <p className="text-sm text-gray-300 font-semibold py-2 ">
+                    Preview <br />Click any word to start:
                   </p>
+          
                   <p className="text-xs text-gray-400">
-                    Words {previewPage * WORDS_PER_PAGE + 1} -{" "}
+                    Words <br />{previewPage * WORDS_PER_PAGE + 1} -{" "}
                     {Math.min((previewPage + 1) * WORDS_PER_PAGE, words.length)}
                   </p>
                 </div>
@@ -277,25 +278,6 @@ const SetGoal = () => {
                     ← Previous
                   </button>
 
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-gray-400">
-                      Page {previewPage + 1} of{" "}
-                      {Math.ceil(words.length / WORDS_PER_PAGE)}
-                    </p>
-                    {startWordIndex > 0 && (
-                      <button
-                        onClick={() => {
-                          setPreviewPage(
-                            Math.floor(startWordIndex / WORDS_PER_PAGE),
-                          );
-                          toast.info("Jumped to selected word");
-                        }}
-                        className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded hover:bg-purple-500/30 transition-colors"
-                      >
-                        Go to selected word
-                      </button>
-                    )}
-                  </div>
 
                   <button
                     onClick={() =>
@@ -316,13 +298,33 @@ const SetGoal = () => {
                   </button>
                 </div>
 
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-gray-400">
+                      Page {previewPage + 1} of{" "}
+                      {Math.ceil(words.length / WORDS_PER_PAGE)}
+                    </p>
+                    {startWordIndex > 0 && (
+                      <button
+                        onClick={() => {
+                          setPreviewPage(
+                            Math.floor(startWordIndex / WORDS_PER_PAGE),
+                          );
+                          toast.info("Jumped to selected word");
+                        }}
+                        className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded hover:bg-purple-500/30 transition-colors"
+                      >
+                        Go to selected word
+                      </button>
+                    )}
+                  </div>
+
                 {startWordIndex > 0 && (
                   <p className="text-xs text-purple-300 mt-2 text-center">
                     ✓ Starting from word {startWordIndex + 1} of{" "}
                     {words.length.toLocaleString()}
                   </p>
                 )}
-              </div>
+              {/* </div> */}
             </div>
           )}
 
@@ -344,8 +346,8 @@ const SetGoal = () => {
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
-        <div className="w-full lg:w-[48%] md:w-[48%]">
+      <div className="flex justify-between items-center flex-col mb-6">
+        <div className="w-full">
           <p className="mb-2 font-semibold">Goal (words):</p>
           <input
             type="number"
@@ -355,7 +357,7 @@ const SetGoal = () => {
             className="p-3 border outline-0 border-white/20 rounded-lg w-full bg-white/5 focus:border-purple-400 transition-colors"
           />
         </div>
-        <div className="w-full lg:w-[48%] md:w-[48%]">
+        <div className="w-full">
           <p className="mb-2 font-semibold">Words per minute:</p>
           <input
             type="number"

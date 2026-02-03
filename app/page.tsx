@@ -42,7 +42,7 @@ const Home = () => {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur w-full mt-6">
             <ul className="space-y-4 flex justify-between items-baseline text-[14px] flex-col lg:flex-row md:flex-row">
               <li className="w-full lg:w-[24%] md:w-[23%]">
-                <p className="font-semibold text-white mb-1">Upload ebook</p>
+                <p className="font-semibold text-white mb-1">Upload an ebook</p>
                 <p className=" text-gray-400">
                   Add any PDF and let Pace prepare it for focused reading.
                 </p>

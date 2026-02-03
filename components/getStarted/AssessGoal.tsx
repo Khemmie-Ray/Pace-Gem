@@ -92,13 +92,8 @@ const AssessGoal = () => {
           </div>
         </div>
 
-        {/* Placeholder for Opik AI insights */}
-        <div className="p-4 rounded-lg linear-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30">
-          {/* <p className="text-xs text-purple-300 mb-2">🤖 AI Insights (Coming Soon)</p>
-          <p className="text-sm text-gray-300">
-            Opik AI will analyze your reading patterns and provide personalized recommendations here.
-          </p> */}
-          {/* AI Performance Analysis */}
+        <div className="mt-4">
+         <p className="text-xl font-bold font-montserrat mb-6 bg-linear-to-br from-purple-400 to-white bg-clip-text text-transparent">AI Performance Analysis </p>
           {isAnalyzing && (
             <div className="p-4 rounded-lg bg-purple-900/20 border border-purple-500/30 animate-pulse">
               <p className="text-sm text-purple-300">
@@ -109,7 +104,6 @@ const AssessGoal = () => {
 
           {aiAnalysis && (
             <div className="space-y-3 mt-6">
-              {/* Summary */}
               <div className="p-4 rounded-lg bg-linear-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30">
                 <p className="text-xs text-purple-300 mb-1">
                   🤖 AI Performance Summary
@@ -117,7 +111,6 @@ const AssessGoal = () => {
                 <p className="text-sm text-white">{aiAnalysis.summary}</p>
               </div>
 
-              {/* Strengths */}
               {aiAnalysis.strengths && (
                 <div className="p-3 rounded-lg bg-green-900/20 border border-green-500/30">
                   <p className="text-xs text-green-300 mb-2 font-semibold">

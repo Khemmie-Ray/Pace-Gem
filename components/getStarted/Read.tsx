@@ -1,7 +1,13 @@
-"use client"
+"use client";
 
-import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useReading } from '@/contexts/ReadingContext';
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { useReading } from "@/contexts/ReadingContext";
 
 const Read = () => {
   const {
@@ -24,12 +30,14 @@ const Read = () => {
 
   if (!hasStarted) {
     return (
-      <div className="bg-linear-to-br from-gray-900 via-purple-900 to-gray-900 backdrop-blur-lg rounded-2xl p-6 h-[70vh] flex items-center justify-center">
+      <div className="bg-linear-to-br from-gray-900 via-purple-900 to-gray-900 backdrop-blur-lg rounded-2xl p-6 h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-3xl font-bold mb-4 text-gray-400">
+          <h2 className="lg:text-[64px] md:text-[48px] text-[34px] font-bold mb-4 text-gray-400">
             Set your goals to begin reading
           </h2>
-          <p className="text-gray-300">Upload a file and configure your reading settings</p>
+          <p className="text-gray-300 lg:text-[16px] md:text-[16px] text-[14px]">
+            Upload a file and configure your reading settings
+          </p>
         </div>
       </div>
     );
@@ -37,64 +45,63 @@ const Read = () => {
 
   return (
     <div>
-      <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
-        <div className="w-full border-2 border-white/20 rounded-xl flex flex-col justify-center items-center h-[60vh] bg-linear-to-br from-purple-900/20 to-pink-900/20 relative">
+      <div className="w-full border-2 border-white/20 rounded-xl flex flex-col justify-center items-center h-[60vh] bg-linear-to-br from-purple-900/20 to-pink-900/20 relative p-6">
+        <div className="absolute top-0 left-0 w-full h-2 bg-white/10 rounded-t-xl overflow-hidden">
+          <div
+            className="h-full bg-linear-to-r from-purple-500 to-pink-500 transition-all duration-300"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
 
-          <div className="absolute top-0 left-0 w-full h-2 bg-white/10 rounded-t-xl overflow-hidden">
-            <div
-              className="h-full bg-linear-to-r from-purple-500 to-pink-500 transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
+        <p className="lg:text-[100px] md:text-[48px] text-[34px] font-bold text-center px-4 animate-pulse">
+          {words[currentWordIndex] || "Starting..."}
+        </p>
 
-          <p className="text-6xl md:text-8xl font-bold text-center px-4 animate-pulse">
-            {words[currentWordIndex] || 'Starting...'}
-          </p>
+        <p className="text-sm text-gray-400 mt-4">
+          Word {currentWordIndex + 1} of {words.length}
+        </p>
+        <div className="absolute bottom-6 flex gap-4">
+          <button
+            onClick={goBack}
+            className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={currentWordIndex === 0}
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
 
-          <p className="text-sm text-gray-400 mt-4">
-            Word {currentWordIndex + 1} of {words.length}
-          </p>
-          <div className="absolute bottom-6 flex gap-4">
-            <button
-              onClick={goBack}
-              className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={currentWordIndex === 0}
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
+          <button
+            onClick={togglePlayPause}
+            className="p-4 bg-purple-600 hover:bg-purple-700 rounded-full transition-colors"
+          >
+            {isPlaying ? (
+              <Pause className="lg:w-8 lg:h-8 md:w-6 md:h-6 w-6 h-6" />
+            ) : (
+              <Play className="lg:w-8 lg:h-8 md:w-6 md:h-6 w-6 h-6" />
+            )}
+          </button>
 
-            <button
-              onClick={togglePlayPause}
-              className="p-4 bg-purple-600 hover:bg-purple-700 rounded-full transition-colors"
-            >
-              {isPlaying ? (
-                <Pause className="w-8 h-8" />
-              ) : (
-                <Play className="w-8 h-8" />
-              )}
-            </button>
+          <button
+            onClick={goForward}
+            className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={currentWordIndex >= words.length - 1}
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
 
-            <button
-              onClick={goForward}
-              className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={currentWordIndex >= words.length - 1}
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            <button
-              onClick={resetReading}
-              className="p-3 bg-red-600 hover:bg-red-700 rounded-full transition-colors ml-4"
-            >
-              <RotateCcw className="w-6 h-6" />
-            </button>
-          </div>
+          <button
+            onClick={resetReading}
+            className="p-3 bg-red-600 hover:bg-red-700 rounded-full transition-colors ml-4"
+          >
+            <RotateCcw className="w-6 h-6" />
+          </button>
         </div>
       </div>
 
       <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 my-4">
-        <h3 className="text-xl font-bold mb-4 text-purple-400">Live Progress</h3>
-        
+        <h3 className="text-xl font-bold mb-4 text-purple-400">
+          Live Progress
+        </h3>
+
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="border border-white/20 rounded-lg p-4 bg-white/5">
             <p className="text-sm text-gray-300 mb-2">Goal Pace</p>
@@ -105,7 +112,7 @@ const Read = () => {
           <div className="border border-white/20 rounded-lg p-4 bg-white/5">
             <p className="text-sm text-gray-300 mb-2">Actual Pace</p>
             <p className="text-3xl font-bold text-pink-400">
-              {actualWPM || '--'}
+              {actualWPM || "--"}
             </p>
             <p className="text-xs text-gray-400">WPM</p>
           </div>
@@ -128,7 +135,9 @@ const Read = () => {
         <div className="mt-6 p-4 rounded-lg bg-white/5 border border-white/10">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm">Goal Progress</span>
-            <span className="text-sm font-bold">{progressPercent.toFixed(1)}%</span>
+            <span className="text-sm font-bold">
+              {progressPercent.toFixed(1)}%
+            </span>
           </div>
           <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
             <div
