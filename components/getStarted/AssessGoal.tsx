@@ -93,7 +93,9 @@ const AssessGoal = () => {
         </div>
 
         <div className="mt-4">
-         <p className="text-xl font-bold font-montserrat mb-6 bg-linear-to-br from-purple-400 to-white bg-clip-text text-transparent">AI Performance Analysis </p>
+          <p className="text-xl font-bold font-montserrat mb-6 bg-linear-to-br from-purple-400 to-white bg-clip-text text-transparent">
+            AI Performance Analysis{" "}
+          </p>
           {isAnalyzing && (
             <div className="p-4 rounded-lg bg-purple-900/20 border border-purple-500/30 animate-pulse">
               <p className="text-sm text-purple-300">
@@ -124,7 +126,6 @@ const AssessGoal = () => {
                 </div>
               )}
 
-              {/* Improvements */}
               {aiAnalysis.improvements && (
                 <div className="p-3 rounded-lg bg-blue-900/20 border border-blue-500/30">
                   <p className="text-xs text-blue-300 mb-2 font-semibold">
@@ -138,7 +139,6 @@ const AssessGoal = () => {
                 </div>
               )}
 
-              {/* Next Goal */}
               {aiAnalysis.nextGoal && (
                 <div className="p-3 rounded-lg bg-orange-900/20 border border-orange-500/30">
                   <p className="text-xs text-orange-300 mb-1 font-semibold">

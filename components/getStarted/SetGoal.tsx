@@ -120,7 +120,11 @@ const SetGoal = () => {
               ) : fileName ? (
                 <>
                   <CheckCircle className="w-8 h-8 text-green-400" />
-                  <p className="text-center text-green-300 wrap-break-all whitespace-normal px-4">{fileName.length > 40 ? fileName.slice(0, 40) + "..." : fileName}</p>
+                  <p className="text-center text-green-300 wrap-break-all whitespace-normal px-4">
+                    {fileName.length > 40
+                      ? fileName.slice(0, 40) + "..."
+                      : fileName}
+                  </p>
                   <p className="text-xs text-gray-400">
                     Click to upload different file
                   </p>
@@ -185,169 +189,138 @@ const SetGoal = () => {
               </p>
             </div>
           </div>
-          {words.length > 0 && (
-            <div className="mb-6 space-y-4 mt-4">
-            
-              {chapters.length > 0 && (
-                <div className="p-4 rounded-lg border border-white/20 bg-white/5">
-                  <p className="text-sm text-gray-300 mb-3 font-semibold">
-                    Jump to Section:
-                  </p>
-                  <select
-                    value={
-                      chapters.findIndex(
-                        (ch) =>
-                          ch.startIndex <= startWordIndex &&
-                          ch.endIndex > startWordIndex,
-                      ) ?? 0
-                    }
-                    onChange={(e) => {
-                      const chapterIndex = parseInt(e.target.value);
-                      const chapter = chapters[chapterIndex];
-                      if (chapter) {
-                        setStartWordIndex(chapter.startIndex);
-                        setPreviewPage(
-                          Math.floor(chapter.startIndex / WORDS_PER_PAGE),
-                        );
-                        toast.success(`Will start from: ${chapter.title}`);
-                      }
-                    }}
-                    className="w-full p-2 border border-white/20 rounded-lg bg-white/5 text-white focus:border-purple-400 transition-colors"
-                  >
-                    {chapters.map((chapter, idx) => (
-                      <option key={idx} value={idx}>
-                        {chapter.title} (Word {chapter.startIndex + 1})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+        </div>
+      )}
+   
+      {words.length > 0 && (
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-2 mt-3 border-b border-white/20">
+            <p className="text-sm text-gray-300 font-semibold py-2 ">
+              Preview <br />
+              Click any word to start:
+            </p>
 
-              {/* <div className=""> */}
-                <div className="flex justify-between items-center mb-2 mt-3 border-b border-white/20">
-                  <p className="text-sm text-gray-300 font-semibold py-2 ">
-                    Preview <br />Click any word to start:
-                  </p>
-          
-                  <p className="text-xs text-gray-400">
-                    Words <br />{previewPage * WORDS_PER_PAGE + 1} -{" "}
-                    {Math.min((previewPage + 1) * WORDS_PER_PAGE, words.length)}
-                  </p>
-                </div>
+            <p className="text-xs text-gray-400">
+              Words <br />
+              {previewPage * WORDS_PER_PAGE + 1} -{" "}
+              {Math.min((previewPage + 1) * WORDS_PER_PAGE, words.length)}
+            </p>
+          </div>
+          <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar mb-3">
+            <p className="text-base leading-relaxed">
+              {words
+                .slice(
+                  previewPage * WORDS_PER_PAGE,
+                  (previewPage + 1) * WORDS_PER_PAGE,
+                )
+                .map((word, relativeIdx) => {
+                  const absoluteIdx =
+                    previewPage * WORDS_PER_PAGE + relativeIdx;
 
-                <div className="max-h-40 overflow-y-auto pr-2 custom-scrollbar mb-3">
-                  <p className="text-sm leading-relaxed">
-                    {words
-                      .slice(
-                        previewPage * WORDS_PER_PAGE,
-                        (previewPage + 1) * WORDS_PER_PAGE,
-                      )
-                      .map((word, relativeIdx) => {
-                        const absoluteIdx =
-                          previewPage * WORDS_PER_PAGE + relativeIdx;
-                        return (
-                          <span
-                            key={absoluteIdx}
-                            onClick={() => {
-                              setStartWordIndex(absoluteIdx);
-                              toast.success(
-                                `Will start from word ${absoluteIdx + 1}: "${word}"`,
-                              );
-                            }}
-                            className={`cursor-pointer hover:bg-purple-500/30 hover:text-purple-200 px-1 rounded transition-colors ${
-                              absoluteIdx === startWordIndex
-                                ? "bg-purple-500/50 text-purple-100 font-bold"
-                                : ""
-                            }`}
-                          >
-                            {word}{" "}
-                          </span>
-                        );
-                      })}
-                  </p>
-                </div>
+                  const isAllCaps =
+                    word.length >= 3 &&
+                    word === word.toUpperCase() &&
+                    /^[A-Z]+$/.test(word);
+                  const isNumberedHeading = /^\d+\.$/.test(word);
+                  const isPotentialHeading = isAllCaps || isNumberedHeading;
 
-                <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                  <button
-                    onClick={() =>
-                      setPreviewPage((prev) => Math.max(0, prev - 1))
-                    }
-                    disabled={previewPage === 0}
-                    className="px-3 py-1.5 text-sm bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors"
-                  >
-                    ← Previous
-                  </button>
+                  const prevWord =
+                    absoluteIdx > 0 ? words[absoluteIdx - 1] : "";
+                  const prevIsAllCaps =
+                    prevWord.length >= 3 &&
+                    prevWord === prevWord.toUpperCase() &&
+                    /^[A-Z]+$/.test(prevWord);
 
+                  const needsLineBreak =
+                    isPotentialHeading &&
+                    !prevIsAllCaps &&
+                    absoluteIdx > previewPage * WORDS_PER_PAGE;
 
-                  <button
-                    onClick={() =>
-                      setPreviewPage((prev) =>
-                        Math.min(
-                          Math.ceil(words.length / WORDS_PER_PAGE) - 1,
-                          prev + 1,
-                        ),
-                      )
-                    }
-                    disabled={
-                      previewPage >=
-                      Math.ceil(words.length / WORDS_PER_PAGE) - 1
-                    }
-                    className="px-3 py-1.5 text-sm bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors"
-                  >
-                    Next →
-                  </button>
-                </div>
-
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-400">
-                      Page {previewPage + 1} of{" "}
-                      {Math.ceil(words.length / WORDS_PER_PAGE)}
-                    </p>
-                    {startWordIndex > 0 && (
-                      <button
+                  return (
+                    <React.Fragment key={absoluteIdx}>
+                      {needsLineBreak && (
+                        <>
+                          <br />
+                          <br />
+                        </>
+                      )}
+                      <span
                         onClick={() => {
-                          setPreviewPage(
-                            Math.floor(startWordIndex / WORDS_PER_PAGE),
+                          setStartWordIndex(absoluteIdx);
+                          toast.success(
+                            `Starting from word ${absoluteIdx + 1}: "${word}"`,
                           );
-                          toast.info("Jumped to selected word");
                         }}
-                        className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded hover:bg-purple-500/30 transition-colors"
+                        className={`cursor-pointer px-0.5 rounded transition-colors ${
+                          isPotentialHeading
+                            ? "text-yellow-300 font-bold text-lg hover:bg-yellow-500/30"
+                            : absoluteIdx === startWordIndex
+                              ? "bg-purple-500/50 text-purple-100 font-bold"
+                              : "hover:bg-purple-500/20 hover:text-purple-200"
+                        }`}
                       >
-                        Go to selected word
-                      </button>
-                    )}
-                  </div>
+                        {word}{" "}
+                      </span>
+                    </React.Fragment>
+                  );
+                })}
+            </p>
+          </div>
+          <div className="flex items-center justify-between pt-3 border-t border-white/10 mb-4">
+            <button
+              onClick={() => setPreviewPage((prev) => Math.max(0, prev - 1))}
+              disabled={previewPage === 0}
+              className="px-4 py-2 text-sm bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors font-semibold"
+            >
+              ← Previous
+            </button>
 
-                {startWordIndex > 0 && (
-                  <p className="text-xs text-purple-300 mt-2 text-center">
-                    ✓ Starting from word {startWordIndex + 1} of{" "}
-                    {words.length.toLocaleString()}
-                  </p>
-                )}
-              {/* </div> */}
-            </div>
-          )}
+            <button
+              onClick={() =>
+                setPreviewPage((prev) =>
+                  Math.min(
+                    Math.ceil(words.length / WORDS_PER_PAGE) - 1,
+                    prev + 1,
+                  ),
+                )
+              }
+              disabled={
+                previewPage >= Math.ceil(words.length / WORDS_PER_PAGE) - 1
+              }
+              className="px-4 py-2 text-sm bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors font-semibold"
+            >
+              Next →
+            </button>
+          </div>
+          <div className="flex items-center justify-between border-b border-white/20 pb-4">
+            <p className="text-xs text-gray-400">
+              Page {previewPage + 1} of{" "}
+              {Math.ceil(words.length / WORDS_PER_PAGE)}
+            </p>
+            {startWordIndex > 0 && (
+              <button
+                onClick={() => {
+                  setPreviewPage(Math.floor(startWordIndex / WORDS_PER_PAGE));
+                  toast.info("Jumped to selected word");
+                }}
+                className="text-xs px-3 py-1 bg-purple-500/20 text-purple-300 rounded hover:bg-purple-500/30 transition-colors"
+              >
+                Jump to selected
+              </button>
+            )}
+          </div>
 
-          {chapters.length > 0 && chapters.length < 20 && (
-            <div className="mt-4 pt-4 border-t border-white/10">
-              <p className="text-xs text-gray-400 mb-2">Chapters detected:</p>
-              <div className="max-h-32 overflow-y-auto text-xs space-y-1">
-                {chapters.map((chapter, idx) => (
-                  <div key={idx} className="flex justify-between text-gray-300">
-                    <span className="truncate">{chapter.title}</span>
-                    <span className="text-gray-500 ml-2">
-                      {chapter.wordCount} words
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {startWordIndex > 0 && (
+            <p className="text-xs text-purple-300 mt-3 text-center bg-purple-900/20 py-2 rounded-lg">
+              ✓ Starting from word {startWordIndex + 1} of{" "}
+              {words.length.toLocaleString()}
+            </p>
           )}
         </div>
       )}
 
-      <div className="flex justify-between items-center flex-col mb-6">
-        <div className="w-full">
+      <div className="flex justify-between items-center flex-col my-6">
+        <div className="w-full mb-3">
           <p className="mb-2 font-semibold">Goal (words):</p>
           <input
             type="number"

@@ -53,7 +53,7 @@ const Read = () => {
           />
         </div>
 
-        <p className="lg:text-[100px] md:text-[48px] text-[34px] font-bold text-center px-4 animate-pulse">
+        <p className="lg:text-[100px] md:text-[48px] text-[34px] font-bold text-center px-4 animate-pulse break-all whitespace-normal">
           {words[currentWordIndex] || "Starting..."}
         </p>
 
@@ -131,7 +131,6 @@ const Read = () => {
             <p className="text-xs text-gray-400">minutes</p>
           </div>
         </div>
-
         <div className="mt-6 p-4 rounded-lg bg-white/5 border border-white/10">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm">Goal Progress</span>
