@@ -49,6 +49,14 @@ interface ReadingContextType {
   isAnalyzing: boolean;
   analyzeSession: () => Promise<void>;
   goalAchieved: boolean;
+
+  quizData: any;
+  showQuiz: boolean;
+  quizScore: number;
+  isGeneratingQuiz: boolean;
+  generateQuiz: () => Promise<void>;
+  setShowQuiz: (show: boolean) => void;
+  setQuizScore: (score: number) => void;
 }
 
 const ReadingContext = createContext<ReadingContextType | undefined>(undefined);
@@ -76,6 +84,12 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
   const [aiAnalysis, setAiAnalysis] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [goalAchieved, setGoalAchieved] = useState<boolean>(false);
+
+  // Quiz states
+  const [quizData, setQuizData] = useState<any>(null);
+  const [showQuiz, setShowQuiz] = useState<boolean>(false);
+  const [quizScore, setQuizScore] = useState<number>(0);
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState<boolean>(false);
 
   const loadDummyData = () => {
     const wordsArray = DUMMY_TEXT.split(/\s+/).filter(
@@ -208,6 +222,45 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // Generate comprehension quiz
+  const generateQuiz = async () => {
+    if (wordsRead < 500) {
+      toast.error("Read at least 500 words before taking a quiz");
+      return;
+    }
+
+    setIsGeneratingQuiz(true);
+
+    try {
+      const textRead = words.slice(startWordIndex, currentWordIndex).join(" ");
+
+      const response = await fetch("/api/ai/generate-quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          textRead,
+          wordCount: wordsRead,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setQuizData(result.quiz);
+        setShowQuiz(true);
+        setIsPlaying(false);
+        toast.success("Quiz ready! Test your comprehension");
+      } else {
+        toast.error(result.error || "Failed to generate quiz");
+      }
+    } catch (error) {
+      console.error("Quiz generation failed:", error);
+      toast.error("Failed to generate quiz");
+    } finally {
+      setIsGeneratingQuiz(false);
+    }
+  };
+
   const goForward = () => {
     if (currentWordIndex < words.length - 1) {
       setCurrentWordIndex((prev) => prev + 1);
@@ -267,6 +320,13 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({
         isAnalyzing,
         analyzeSession,
         goalAchieved,
+        quizData,
+        showQuiz,
+        quizScore,
+        isGeneratingQuiz,
+        generateQuiz,
+        setShowQuiz,
+        setQuizScore,
       }}
     >
       {children}

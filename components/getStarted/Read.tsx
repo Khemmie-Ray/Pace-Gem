@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Play,
   Pause,
@@ -8,6 +9,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useReading } from "@/contexts/ReadingContext";
+import ComprehensionQuiz from "@/components/getStarted/ComprehensionQuiz";
 
 const Read = () => {
   const {
@@ -26,7 +28,28 @@ const Read = () => {
     timeSpent,
     formatTime,
     actualWPM,
+    generateQuiz,
   } = useReading();
+
+  const [quizTriggered, setQuizTriggered] = useState(false);
+
+  // Trigger quiz when goal is achieved
+  useEffect(() => {
+    if (progressPercent >= 100 && !quizTriggered && hasStarted) {
+      // Small delay to let user see the completion message
+      setTimeout(() => {
+        generateQuiz();
+        setQuizTriggered(true);
+      }, 2000);
+    }
+  }, [progressPercent, quizTriggered, hasStarted, generateQuiz]);
+
+  // Reset quiz trigger when reading is reset
+  useEffect(() => {
+    if (progressPercent < 100) {
+      setQuizTriggered(false);
+    }
+  }, [progressPercent]);
 
   if (!hasStarted) {
     return (
@@ -151,6 +174,9 @@ const Read = () => {
           )}
         </div>
       </div>
+
+      {/* Comprehension Quiz Modal - No props needed, reads from context */}
+      <ComprehensionQuiz />
     </div>
   );
 };
