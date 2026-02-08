@@ -34,7 +34,7 @@ Provide a JSON response with:
 Be encouraging but honest. Focus on actionable insights.`;
 
     const response = await gemini.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3-pro-preview",
       contents: prompt,
     });
 

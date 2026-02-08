@@ -6,7 +6,7 @@ import { Opik } from "opik";
 const opikClient = new Opik({
   apiKey: process.env.OPIK_API_KEY,
   workspaceName: process.env.OPIK_WORKSPACE,
-  projectName: 'pace-reading-app',
+  projectName: 'Pace-Gem3',
 });
 
 // Create Gemini client
