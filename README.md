@@ -125,7 +125,7 @@ Gemini: { score: 95, feedback: "Perfect! Different words, same meaning." }
 
 ```bash
 # 1. Clone
-git clone https://github.com/Khemmie-Ray/pace.git
+git clone https://github.com/Khemmie-Ray/Pace-Gem
 cd pace
 
 # 2. Install
@@ -181,7 +181,7 @@ npm run dev
 ## Links
 
 - **Demo**: [pace-gem.vercel.app](https://pace-gem.vercel.app)
-- **GitHub**: [github.com/Khemmie-Ray/pace](https://github.com/Khemmie-Ray/pace)
+- **GitHub**: [github.com/Khemmie-Ray/pace-gem](https://github.com/Khemmie-Ray/Pace-Gem)
 - **Opik Dashboard**: [View traces](https://www.comet.com/opik)
 
 ---
