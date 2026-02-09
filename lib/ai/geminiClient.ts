@@ -18,7 +18,7 @@ const genAI = new GoogleGenAI({
 const trackedGenAI = trackGemini(genAI, {
   client: opikClient,
   traceMetadata: {
-    tags: ['pace-reading-app', 'gemini'],
+    tags: ['Pace-Gem3', 'gemini'],
   },
 });
 
